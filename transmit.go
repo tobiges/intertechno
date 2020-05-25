@@ -5,8 +5,12 @@ import (
 )
 
 const (
-	repeats         = 15  // [0..8] The 2log-Number of times the signal is repeated. The actual number of repeats will be 2^repeats. 2 would be bare minimum, 4 seems robust, 8 is maximum (and overkill).
-	periodusec uint = 260 // Duration of one period, in microseconds. One bit takes 8 periods (but only 4 for 'dim' signal).
+	repeats    = 15  // [0..8] The 2log-Number of times the signal is repeated. The actual number of repeats will be 2^repeats. 2 would be bare minimum, 4 seems robust, 8 is maximum (and overkill).
+	periodusec = 260 // Duration of one period, in microseconds. One bit takes 8 periods (but only 4 for 'dim' signal).
+
+	addressBits  = 26
+	unitBits     = 4
+	dimvalueBits = 4
 )
 
 func (im *Manager) transmit(c Command) error {
@@ -37,19 +41,19 @@ func (im *Manager) sendStartPulse() {
 	time.Sleep(time.Microsecond * time.Duration(periodusec*10+(periodusec>>1))) // Actually 10.5T insteat of 10.44T. Close enough.
 }
 
-func (im *Manager) sendAddress(address uint) {
-	for i := 25; i >= 0; i-- {
+func (im *Manager) sendAddress(address int) {
+	for i := addressBits-1; i >= 0; i-- {
 		im.sendBit((address>>i)&1 != 0)
 	}
 }
 
-func (im *Manager) sendUnit(unit uint) {
-	for i := 3; i >= 0; i-- {
+func (im *Manager) sendUnit(unit int) {
+	for i := unitBits-1; i >= 0; i-- {
 		im.sendBit(unit&(1<<i) != 0)
 	}
 }
 
-func (im *Manager) sendDim(dimvalue uint, unit uint) {
+func (im *Manager) sendDim(dimvalue int, unit int) {
 	im.setPinHigh()
 	sleepPeriodusec()
 	im.setPinLow()
@@ -61,7 +65,7 @@ func (im *Manager) sendDim(dimvalue uint, unit uint) {
 
 	im.sendUnit(unit)
 
-	for i := 3; i >= 0; i-- {
+	for i := dimvalueBits-1; i >= 0; i-- {
 		im.sendBit(dimvalue&(1<<i) != 0)
 	}
 }
@@ -97,7 +101,7 @@ func (im *Manager) sendBit(isBitOne bool) {
 	}
 }
 
-func sleepCustomPeriodusec(m uint) {
+func sleepCustomPeriodusec(m int) {
 	time.Sleep(time.Microsecond * time.Duration(periodusec*m))
 }
 
