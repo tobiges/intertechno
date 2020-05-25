@@ -1,56 +1,51 @@
-package intertechno433mhz
+package intertechno
 
 import (
 	"errors"
 	"sync"
 
-	"github.com/warthog618/gpio"
+	"github.com/stianeikeland/go-rpio/v4"
 )
 
 // ErrIntertechnoManagerClosed when IntertechnoManager is closed
 var ErrIntertechnoManagerClosed = errors.New("IntertechnoManager is closed")
 
-// IntertechnoManager manages all the rc 433mhz switching operations
+// Manager manages all the rc 433mhz switching operations
 // it can be accessed by multiple goroutines concurrently
-type IntertechnoManager struct {
+type Manager struct {
 	sync.Mutex
-	pin    *gpio.Pin
+	pin    rpio.Pin
 	closed bool
 }
 
 // NewIntertechnoManager returns a new IntertechnoManager
-func NewIntertechnoManager(pin int) (*IntertechnoManager, error) {
-	err := gpio.Open()
+func NewIntertechnoManager(pin int) (*Manager, error) {
+	err := rpio.Open()
 	if err != nil {
 		return nil, err
 	}
-	im := &IntertechnoManager{pin: gpio.NewPin(pin)}
+	im := &Manager{pin: rpio.Pin(pin)}
 	im.pin.Output()
 	return im, nil
 }
 
 // Close closes the IntertechnoManager and cleans up
-func (im *IntertechnoManager) Close() {
+func (im *Manager) Close() {
 	im.Lock()
 	defer im.Unlock()
 	im.closed = true
-	gpio.Close()
+	rpio.Close()
 }
 
 // ExecuteCommand executes the passed command
-func (im *IntertechnoManager) ExecuteCommand(c Command) error {
-	if im.isClosed() {
-		return ErrIntertechnoManagerClosed
-	}
-	if err := c.isValid(); err != nil {
-		return err
-	}
-	im.transmit(c)
-	return nil
-}
-
-func (im *IntertechnoManager) isClosed() bool {
+func (im *Manager) ExecuteCommand(c Command) error {
 	im.Lock()
 	defer im.Unlock()
-	return im.closed
+	if im.closed {
+		return ErrIntertechnoManagerClosed
+	}
+	if err := im.transmit(c); err != nil {
+		return err
+	}
+	return nil
 }

@@ -1,4 +1,4 @@
-package intertechno433mhz
+package intertechno
 
 import (
 	"time"
@@ -9,9 +9,10 @@ const (
 	periodusec uint = 260 // Duration of one period, in microseconds. One bit takes 8 periods (but only 4 for 'dim' signal).
 )
 
-func (im *IntertechnoManager) transmit(c Command) {
-	im.Lock()
-	defer im.Unlock()
+func (im *Manager) transmit(c Command) error {
+	if err := c.isValid(); err != nil {
+		return err
+	}
 	for i := repeats; i >= repeats; i-- {
 		im.sendStartPulse()
 		im.sendAddress(c.Address)
@@ -26,28 +27,29 @@ func (im *IntertechnoManager) transmit(c Command) {
 
 		im.sendStopPulse()
 	}
+	return nil
 }
 
-func (im *IntertechnoManager) sendStartPulse() {
+func (im *Manager) sendStartPulse() {
 	im.setPinHigh()
 	sleepPeriodusec()
 	im.setPinLow()
 	time.Sleep(time.Microsecond * time.Duration(periodusec*10+(periodusec>>1))) // Actually 10.5T insteat of 10.44T. Close enough.
 }
 
-func (im *IntertechnoManager) sendAddress(address uint) {
+func (im *Manager) sendAddress(address uint) {
 	for i := 25; i >= 0; i-- {
 		im.sendBit((address>>i)&1 != 0)
 	}
 }
 
-func (im *IntertechnoManager) sendUnit(unit uint) {
+func (im *Manager) sendUnit(unit uint) {
 	for i := 3; i >= 0; i-- {
 		im.sendBit(unit&(1<<i) != 0)
 	}
 }
 
-func (im *IntertechnoManager) sendDim(dimvalue uint, unit uint) {
+func (im *Manager) sendDim(dimvalue uint, unit uint) {
 	im.setPinHigh()
 	sleepPeriodusec()
 	im.setPinLow()
@@ -64,14 +66,14 @@ func (im *IntertechnoManager) sendDim(dimvalue uint, unit uint) {
 	}
 }
 
-func (im *IntertechnoManager) sendStopPulse() {
+func (im *Manager) sendStopPulse() {
 	im.setPinHigh()
 	sleepPeriodusec()
 	im.setPinLow()
 	sleepCustomPeriodusec(40)
 }
 
-func (im *IntertechnoManager) sendBit(isBitOne bool) {
+func (im *Manager) sendBit(isBitOne bool) {
 	if isBitOne {
 		// Send '1'
 		im.setPinHigh()
@@ -103,10 +105,10 @@ func sleepPeriodusec() {
 	time.Sleep(time.Microsecond * time.Duration(periodusec))
 }
 
-func (im *IntertechnoManager) setPinHigh() {
+func (im *Manager) setPinHigh() {
 	im.pin.High()
 }
 
-func (im *IntertechnoManager) setPinLow() {
+func (im *Manager) setPinLow() {
 	im.pin.Low()
 }

@@ -1,4 +1,4 @@
-package intertechno433mhz
+package intertechno
 
 import (
 	"errors"
@@ -40,19 +40,18 @@ func (ia IntertechnoAction) isValid() bool {
 	return ia < actionEnd
 }
 
-
 // Command is used to store the information to send
 type Command struct {
 	// Address Address of this transmitter [0..2^26-1]
-	Address  uint
+	Address uint
 	// Action ActoinOff (0) => off, ActionOn (1) => on, ActionDim (2) => dim (dimvalue has to be set)
-	Action   IntertechnoAction
+	Action IntertechnoAction
 	// Dimvalue [1..15] Dim level if action is set to ActionDim. 15 for brightest level.
 	Dimvalue uint
 	// Unit [0..15] unit of the device
-	Unit     uint
+	Unit uint
 	// Group True to send command to the address group.
-	Group    bool
+	Group bool
 }
 
 func (c Command) isValid() error {

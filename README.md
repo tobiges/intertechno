@@ -1,1 +1,1 @@
-# intertechno433mhz
+# intertechno
