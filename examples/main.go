@@ -35,6 +35,4 @@ func main() {
 		Group:   true,
 	}
 	intertechnoManager.ExecuteCommand(c)
-
-	intertechnoManager.Close()
 }
