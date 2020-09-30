@@ -17,7 +17,7 @@ func (im *Manager) transmit(c Command) error {
 	if err := c.isValid(); err != nil {
 		return err
 	}
-	for i := repeats; i >= repeats; i-- {
+	for i := repeats; i >= 0; i-- {
 		im.sendStartPulse()
 		im.sendAddress(c.Address)
 		im.sendBit(c.Group)
@@ -42,13 +42,13 @@ func (im *Manager) sendStartPulse() {
 }
 
 func (im *Manager) sendAddress(address int) {
-	for i := addressBits-1; i >= 0; i-- {
+	for i := addressBits - 1; i >= 0; i-- {
 		im.sendBit((address>>i)&1 != 0)
 	}
 }
 
 func (im *Manager) sendUnit(unit int) {
-	for i := unitBits-1; i >= 0; i-- {
+	for i := unitBits - 1; i >= 0; i-- {
 		im.sendBit(unit&(1<<i) != 0)
 	}
 }
@@ -65,7 +65,7 @@ func (im *Manager) sendDim(dimvalue int, unit int) {
 
 	im.sendUnit(unit)
 
-	for i := dimvalueBits-1; i >= 0; i-- {
+	for i := dimvalueBits - 1; i >= 0; i-- {
 		im.sendBit(dimvalue&(1<<i) != 0)
 	}
 }
