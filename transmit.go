@@ -13,9 +13,11 @@ const (
 	dimvalueBits = 4
 )
 
-func (im *Manager) transmit(c Command) error {
-	if err := c.isValid(); err != nil {
-		return err
+func (im *Manager) transmit(c Command) {
+	im.Lock()
+	defer im.Unlock()
+	if im.closed {
+		return
 	}
 	for i := repeats; i >= 0; i-- {
 		im.sendStartPulse()
@@ -31,7 +33,6 @@ func (im *Manager) transmit(c Command) error {
 
 		im.sendStopPulse()
 	}
-	return nil
 }
 
 func (im *Manager) sendStartPulse() {

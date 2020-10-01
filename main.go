@@ -39,13 +39,16 @@ func (im *Manager) Close() {
 
 // ExecuteCommand executes the passed command
 func (im *Manager) ExecuteCommand(c Command) error {
-	im.Lock()
-	defer im.Unlock()
 	if im.closed {
 		return ErrIntertechnoManagerClosed
 	}
-	if err := im.transmit(c); err != nil {
+	if err := c.isValid(); err != nil {
 		return err
+	}
+	if c.Async {
+		go im.transmit(c)
+	} else {
+		im.transmit(c)
 	}
 	return nil
 }

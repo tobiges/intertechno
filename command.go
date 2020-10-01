@@ -52,6 +52,8 @@ type Command struct {
 	Unit int
 	// Group True to send command to the address group.
 	Group bool
+	// Async executing the command will not block
+	Async bool
 }
 
 func (c Command) isValid() error {
