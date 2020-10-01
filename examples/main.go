@@ -7,7 +7,7 @@ import (
 const pin = 6
 
 func main() {
-	intertechnoManager, err := intertechno.NewIntertechnoManager(pin)
+	intertechnoManager, err := intertechno.NewIntertechnoManager(pin, false)
 	if err != nil {
 		panic(err)
 	}

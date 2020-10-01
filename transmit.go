@@ -14,11 +14,6 @@ const (
 )
 
 func (im *Manager) transmit(c Command) {
-	im.Lock()
-	defer im.Unlock()
-	if im.closed {
-		return
-	}
 	for i := repeats; i >= 0; i-- {
 		im.sendStartPulse()
 		im.sendAddress(c.Address)
