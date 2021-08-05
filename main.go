@@ -7,11 +7,12 @@ import (
 	"github.com/stianeikeland/go-rpio/v4"
 )
 
-// ErrIntertechnoManagerClosed when IntertechnoManager is closed
-var ErrIntertechnoManagerClosed = errors.New("IntertechnoManager is closed")
-
-// ErrIntertechnoCommandBufferFull command buffer full
-var ErrIntertechnoCommandBufferFull = errors.New("Intertechno command buffer full")
+var (
+	// ErrIntertechnoManagerClosed when IntertechnoManager is closed
+	ErrIntertechnoManagerClosed = errors.New("intertechnoManager is closed")
+	// ErrIntertechnoCommandBufferFull command buffer full
+	ErrIntertechnoCommandBufferFull = errors.New("intertechno command buffer full")
+)
 
 const commandAsyncMaxBufferSize = 50
 
@@ -82,6 +83,7 @@ func (im *Manager) handleAsync() {
 	for c := range im.asyncCmds {
 		im.RLock()
 		if im.closed {
+			im.RUnlock()
 			return
 		}
 		im.transmit(c)

@@ -2,6 +2,7 @@ package intertechno
 
 import (
 	"errors"
+	"fmt"
 )
 
 var (
@@ -31,7 +32,7 @@ const (
 func (ia Action) String() string {
 	names := [...]string{"ActoinOff", "ActionOn", "ActionDim"}
 	if !ia.isValid() {
-		return "Invalid Action: " + string(ia)
+		return fmt.Sprintf("Invalid Action: %d", ia)
 	}
 	return names[ia]
 }
@@ -55,13 +56,13 @@ type Command struct {
 }
 
 func (c Command) isValid() error {
-	if c.Address < 0 || (c.Address >> addressBits) != 0 {
+	if c.Address < 0 || (c.Address>>addressBits) != 0 {
 		return ErrInvalidAddress
 	} else if !c.Action.isValid() {
 		return ErrInvalidAction
-	} else if c.Action == ActionDim && (c.Dimvalue < 1 || (c.Dimvalue >> dimvalueBits) != 0) {
+	} else if c.Action == ActionDim && (c.Dimvalue < 1 || (c.Dimvalue>>dimvalueBits) != 0) {
 		return ErrInvalidDimvalue
-	} else if c.Unit < 0 || (c.Unit >> unitBits) != 0 {
+	} else if c.Unit < 0 || (c.Unit>>unitBits) != 0 {
 		return ErrInvalidUnit
 	}
 	return nil

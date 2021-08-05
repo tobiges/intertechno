@@ -4,6 +4,7 @@ import (
 	"github.com/tobiges/intertechno"
 )
 
+// 433mhz transmitter pin
 const pin = 6
 
 func main() {
@@ -12,12 +13,15 @@ func main() {
 		panic(err)
 	}
 	defer intertechnoManager.Close()
+
 	// Turn Device with address 45234543 off
 	c := intertechno.Command{
 		Address: 45234543,
 		Action:  intertechno.ActionOff,
 	}
-	intertechnoManager.ExecuteCommand(c)
+	if err := intertechnoManager.ExecuteCommand(c); err != nil {
+		panic(err)
+	}
 
 	// Dim Device with address 46256432 and unit 4 to the dimvalue 7
 	c = intertechno.Command{
@@ -26,7 +30,9 @@ func main() {
 		Dimvalue: 7,
 		Unit:     4,
 	}
-	intertechnoManager.ExecuteCommand(c)
+	if err := intertechnoManager.ExecuteCommand(c); err != nil {
+		panic(err)
+	}
 
 	// Turn Group with address 425452345 on
 	c = intertechno.Command{
@@ -34,5 +40,7 @@ func main() {
 		Action:  intertechno.ActionOn,
 		Group:   true,
 	}
-	intertechnoManager.ExecuteCommand(c)
+	if err := intertechnoManager.ExecuteCommand(c); err != nil {
+		panic(err)
+	}
 }

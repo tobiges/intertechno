@@ -5,8 +5,14 @@ import (
 )
 
 const (
-	repeats    = 15  // [0..8] The 2log-Number of times the signal is repeated. The actual number of repeats will be 2^repeats. 2 would be bare minimum, 4 seems robust, 8 is maximum (and overkill).
-	periodusec = 260 // Duration of one period, in microseconds. One bit takes 8 periods (but only 4 for 'dim' signal).
+	// [0..8] The 2log-Number of times the signal is repeated.
+	// The actual number of repeats will be 2^repeats.
+	// 2 would be bare minimum, 4 seems robust, 8 is maximum (and overkill).
+	repeats = 4
+
+	// Duration of one period, in microseconds.
+	// One bit takes 8 periods (but only 4 for 'dim' signal).
+	periodusec = 260
 
 	addressBits  = 26
 	unitBits     = 4
@@ -14,7 +20,7 @@ const (
 )
 
 func (im *Manager) transmit(c Command) {
-	for i := repeats; i >= 0; i-- {
+	for i := 1 << repeats; i > 0; i-- {
 		im.sendStartPulse()
 		im.sendAddress(c.Address)
 		im.sendBit(c.Group)
@@ -34,7 +40,9 @@ func (im *Manager) sendStartPulse() {
 	im.setPinHigh()
 	sleepPeriodusec()
 	im.setPinLow()
-	time.Sleep(time.Microsecond * time.Duration(periodusec*10+(periodusec>>1))) // Actually 10.5T insteat of 10.44T. Close enough.
+
+	// Actually 10.5T insteat of 10.44T. Close enough.
+	time.Sleep(time.Microsecond * time.Duration(periodusec*10+(periodusec>>1))) 
 }
 
 func (im *Manager) sendAddress(address int) {
