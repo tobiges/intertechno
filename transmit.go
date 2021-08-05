@@ -42,7 +42,7 @@ func (im *Manager) sendStartPulse() {
 	im.setPinLow()
 
 	// Actually 10.5T insteat of 10.44T. Close enough.
-	time.Sleep(time.Microsecond * time.Duration(periodusec*10+(periodusec>>1))) 
+	time.Sleep(time.Microsecond * time.Duration(periodusec*10+(periodusec>>1)))
 }
 
 func (im *Manager) sendAddress(address int) {
